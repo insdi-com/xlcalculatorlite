@@ -40,7 +40,7 @@ def VLOOKUP(
         vlookup-function-0bbc8083-26fe-4963-8ab8-93a18ad188a1
     """
     if range_lookup:
-        raise NotImplementedError("Excact match only supported at the moment.")
+        raise NotImplementedError("Exact match only supported at the moment.")
 
     col_index_num = int(col_index_num)
 
@@ -48,13 +48,24 @@ def VLOOKUP(
         raise xlerrors.ValueExcelError(
             'col_index_num is greater than the number of cols in table_array')
 
-    table_array = table_array.set_index(0)
+    compare = lookup_value.__eq__
 
-    if lookup_value not in table_array.index:
+    try:
+        result = max(row for row in table_array if compare(row[0]))[col_index_num-1]
+        print(f"Vlookup result for {lookup_value} in column {col_index_num} is: {result}")
+    except ValueError:
+        print(f"Vlookup result for {lookup_value} in column {col_index_num} is: None")
         raise xlerrors.NaExcelError(
             '`lookup_value` not in first column of `table_array`.')
+    return result
 
-    return table_array.loc[lookup_value].values[0]
+    # table_array = table_array.set_index(0)
+
+    # if lookup_value not in table_array.index:
+        # raise xlerrors.NaExcelError(
+        #     '`lookup_value` not in first column of `table_array`.')
+
+    # return table_array.loc[lookup_value].values[0]
 
 
 @xl.register()

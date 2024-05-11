@@ -227,6 +227,8 @@ class FunctionNode(ASTNode):
         # 1. Remove the BBB namespace, since we are just supporting
         #    everything in one large one.
         func_name = func_name.replace('_XLFN.', '')
+        if func_name == "SUM":
+            s = 1
         # 2. Look up the function to use.
         func = context.namespace[func_name]
         # 3. Prepare arguments.

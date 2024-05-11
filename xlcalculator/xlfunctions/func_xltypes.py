@@ -1,7 +1,7 @@
 import datetime
 import dateutil
-import numpy
-import pandas
+# import numpy
+# import pandas
 from typing import Optional, Union, NewType
 
 from . import utils, xlerrors
@@ -164,7 +164,9 @@ class ExcelType:
 @register
 class Number(ExcelType):
 
-    native_types = (int, float, numpy.int64, numpy.float64)
+    # JOEL mod
+    # native_types = (int, float, numpy.int64, numpy.float64)
+    native_types = (int, float)
 
     blank_value = 0
 
@@ -323,7 +325,8 @@ class Boolean(ExcelType):
 @register
 class DateTime(ExcelType):
 
-    native_types = (datetime.datetime, numpy.datetime64)
+    # native_types = (datetime.datetime, numpy.datetime64)
+    native_types = (datetime.datetime,)
 
     def _sort_key(self, other):
         return self.__Number__()._sort_key(other)
@@ -416,13 +419,16 @@ def _convert_nested_list(value):
 
 
 @register
-class Array(pandas.DataFrame):
+class Array(list):
 
     native_types = (list, tuple)
 
     def __init__(self, data, *args, **kw):
         try:
+            d = _convert_nested_list(data)
+            # print(f"d = {d}")
             super().__init__(_convert_nested_list(data), *args, **kw)
+            # print(f"Array = {self}")
         except ValueError:
             raise xlerrors.ValueExcelError(f'Invalid array argument: {data}')
 
@@ -431,8 +437,38 @@ class Array(pandas.DataFrame):
         return Array
 
     @property
-    def flat(self):
-        return list(self.values.flat)
+    def values(self):
+        return list(self)   
+
+    @property
+    def shape(self):
+        array = list(self)
+        num_rows = len(array)
+        num_columns = len(array[0])
+        # Get the shape of a nested list
+        for i in range(num_rows): 
+            if len(array[i]) != num_columns:
+                raise xlerrors.ValueExcelError(
+                    f'Nested lists must have the same length to determine the shape')
+        print("Get the shape of a rows: ", num_rows)
+        print("Get the shape of a columns: ", num_columns)
+        return (num_rows, num_columns)       
+
+    @property
+    def flatten_concatenation(self):
+        flat_list = []
+        for row in self:
+            flat_list += row
+        return flat_list
+
+    @property
+    def flat(self): 
+        # print(f"Flat array - pre: {list(self)}")
+        # print(f"Flat array - pre: {list(self.values)}")
+        # print(f"Flat array: {list(self.flatten_concatenation)}")
+        # print(f"Flat array: {list(self.values.flat)}")
+        return list(self.flatten_concatenation)
+        # return list(self.values.flat)
 
     @classmethod
     def cast(cls, value):
