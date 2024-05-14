@@ -5,18 +5,21 @@ from xlcalculator import ModelCompiler
 from xlcalculator import Model
 from xlcalculator import Evaluator
 import os
-import pprint 
+import json
 from pydantic import BaseModel, Field
 from typing import Any, Optional
 from typing import Any
 logging.basicConfig(level=logging.DEBUG)
+import jsonpickle
 
 
-filename = r'./Workers comp rating tool (v2) from Sarel 2024-05-06.xlsx'
+filename = r'./Workers comp rating tool (v2) from Sarel 2024-05-06-Joel1.xlsx'
 compiler = ModelCompiler()
 print(f" ###### Current working directory: {os.getcwd()}")
 new_model = compiler.read_and_parse_archive(filename, build_code=True)
-print(new_model)
+# print(new_model)
+# Save new_model to a file called new_model.json
+new_model.persist_to_json_file("model.json")
 
 evaluator = Evaluator(new_model)
 
@@ -63,5 +66,17 @@ evaluator = Evaluator(new_model)
 # for cell in outputs:
 #     print(f"cell: {cell.name} value: {evaluator.evaluate(cell.address)}")
 
+# my_cell = 'Rating engine!M18'
+# print(f"Result for {my_cell} [{evaluator.evaluate(my_cell)}]")
 
-print(f"Result for Rating engine!M22 [{evaluator.evaluate('Rating engine!M22')}]")
+# my_cell = 'Rating engine!N18'
+# print(f"Result for {my_cell} [{evaluator.evaluate(my_cell)}]")
+
+# my_cell = 'Rating engine!O22'
+# print(f"Result for {my_cell} [{evaluator.evaluate(my_cell)}]")
+
+# my_cell = 'Rating engine!E11'
+# print(f"Result for {my_cell} [{evaluator.evaluate(my_cell)}]")
+
+my_cell = 'Rating tool!D41'
+print(f"Result for {my_cell} [{evaluator.evaluate(my_cell)}]")

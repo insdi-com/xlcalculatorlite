@@ -39,7 +39,12 @@ def VLOOKUP(
     https://support.office.com/en-us/article/
         vlookup-function-0bbc8083-26fe-4963-8ab8-93a18ad188a1
     """
+    print(f"lookup_value: {lookup_value}")
+    print(f"table_array: {table_array}")
+    print(f"col_index_num: {col_index_num}")
+    print(f"range_lookup: {range_lookup}")
     if range_lookup:
+
         raise NotImplementedError("Exact match only supported at the moment.")
 
     col_index_num = int(col_index_num)

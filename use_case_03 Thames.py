@@ -23,7 +23,8 @@ new_model = compiler.read_and_parse_archive(filename, build_code=True)
 
 evaluator = Evaluator(new_model)
 
-
+my_cell = 'Rate Card!C12'
+print(evaluator.evaluate(my_cell))
 
 m1 = evaluator.evaluate('Rate Card!C22')
 print("Rate Card!C22", m1)

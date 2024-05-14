@@ -85,6 +85,7 @@ class Evaluator:
         context = context if context is not None else self._get_context(addr)
         try:
             value = cell.formula.ast.eval(context)
+            # print(value) # TEMP
         except Exception as err:
             raise RuntimeError(
                 f"Problem evaluating cell {addr} formula "
@@ -93,8 +94,10 @@ class Evaluator:
 
         # 4. Update the cell value.
         #    Note for later: If an array is returned, we should distribute the
-        #    values to the respective cell (known as spilling).
+        #    values to the respective cell (known as spilling). 
+        # TODO - Add spilling.
         cell.value = value
+        print(f"{addr} => {cell.value}") #TEMP
         cell.need_update = False
 
         return value

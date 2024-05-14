@@ -205,6 +205,8 @@ class FormulaParser:
                     were_values.append(True)
 
             elif token.ttype == "function":
+                # print(f"function TOKEN: {token.tvalue} ") # TODO -- potentially raise errors for functions we don't accept.
+
                 stack.append(token)
                 arg_count.append(0)
 

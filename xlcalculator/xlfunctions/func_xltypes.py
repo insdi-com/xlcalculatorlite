@@ -5,6 +5,7 @@ import dateutil
 from typing import Optional, Union, NewType
 
 from . import utils, xlerrors
+from dateutil import parser
 
 NATIVE_TO_XLTYPE = {}
 
@@ -252,14 +253,14 @@ class Text(ExcelType):
 
     def __Boolean__(self):
         return Boolean(self.__bool__(by_content_only=True))
-
     def __datetime__(self):
         try:
             return utils.number_to_datetime(float(self.value))
         except (ValueError, OverflowError):
             pass
         try:
-            return dateutil.parser.parse(self.value)
+            return parser.parse(self.value) # NEW
+            # return dateutil.parser.parse(self.value)
         except (ValueError, OverflowError):
             pass
         raise xlerrors.ValueExcelError(

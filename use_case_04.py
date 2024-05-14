@@ -46,8 +46,7 @@ for key, value in input_parms.items():
 
 total_premium = 10
 
-# evaluator.evaluate('contents-insdi!G12')
-# print("contents-insdi!G12", total_premium)
+
 # temp1 = evaluator.evaluate('contents-insdi!G2')
 # print("contents-insdi!G2", temp1)	
 temp1 = evaluator.evaluate('contents-insdi!G4')
@@ -107,5 +106,5 @@ print("contents-insdi!H41", temp1)
 temp1 = evaluator.evaluate('contents-insdi!H42')
 print("contents-insdi!H42", temp1)																																
 
-result = Result(result=total_premium)
+result = evaluator.evaluate('contents-insdi!G12')
 print(f"Final output: {result}")

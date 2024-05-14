@@ -141,12 +141,22 @@ class RangeNode(OperandNode):
     def full_address(self, context):
         addr = self.address
         if '!' not in addr:
-            addr = f'{context.sheet}!{addr}'
+            # Joel new 2024-05-13: Added this to convert a defined/named range to a range address that can be used in the VLOOKUP() function
+            if isinstance(addr, list):
+                # print(f"addr: {addr} is a list")
+                addr_first = str(addr[0][0]).split('!', 1)
+                addr_last = str(addr[-1][-1]).split('!', 1)
+                if ' ' in addr_first[0]:
+                    addr = f"'{addr_first[0]}'!{addr_first[1]}:{addr_last[1]}" 
+                else:
+                    addr = f"{addr_first[0]}!{addr_first[1]}:{addr_last[1]}" 
+                # print(addr)
+            else:
+                addr = f'{context.sheet}!{addr}'
         return addr
 
     def eval(self, context):
         addr = self.full_address(context)
-
         if addr in context.ranges:
             empty_row = 0
             empty_col = 0
@@ -230,12 +240,17 @@ class FunctionNode(ASTNode):
         if func_name == "SUM":
             s = 1
         # 2. Look up the function to use.
+        # TODO - this is another place to raise an error if function does not exist.
         func = context.namespace[func_name]
         # 3. Prepare arguments.
         sig = inspect.signature(func)
         bound = sig.bind(*self.args)
         args = []
         for pname, pvalue in list(bound.arguments.items()):
+
+            # if pname == 'table_array':          # TEMP
+            #     print(f"pvalue:\n{pvalue}")     # TEMP
+
             param = sig.parameters[pname]
             ptype = param.annotation
             if ptype == func_xltypes.XlExpr:

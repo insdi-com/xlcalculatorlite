@@ -1,6 +1,6 @@
 import copy
 import gzip
-# import jsonpickle
+import jsonpickle # TEMP - comment out for production
 import logging
 import os
 from dataclasses import dataclass, field
@@ -22,7 +22,10 @@ class Model():
 
     def set_cell_value(self, address, value):
         """Sets a new value for a specified cell."""
+        print(f"set_cell_value  address: {address} value: {value}")
+
         if address in self.defined_names:
+            print("Address is a defined name")
             if isinstance(self.defined_names[address], xltypes.XLCell):
                 address = self.defined_names[address].address
 
@@ -46,7 +49,10 @@ class Model():
             )
 
     def get_cell_value(self, address):
+        print(f"GET_cell_value  address: {address}")
+
         if address in self.defined_names:
+            print(f"GET_cell_value address is defined name")
             if isinstance(self.defined_names[address], xltypes.XLCell):
                 address = self.defined_names[address].address
 
@@ -205,6 +211,7 @@ class ModelCompiler:
                     input_dict[item],
                     sheet_name=default_sheet
                 )
+                print(f"read_and_parse_dict Formula = {formula}") # TEMP
                 cell = xltypes.XLCell(
                     cell_address, None,
                     formula=formula)
