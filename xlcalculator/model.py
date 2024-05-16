@@ -202,6 +202,9 @@ class ModelCompiler:
                 cell_address = item
             else:
                 cell_address = "{}!{}".format(default_sheet, item)
+            
+            if cell_address == "Rating sheet!U101":  # TEMP
+                print("U101")
 
             if (
                     not isinstance(input_dict[item], (float, int))
@@ -272,8 +275,12 @@ class ModelCompiler:
                 if any(isinstance(el, list) for el in defn.cells):
                     for column in defn.cells:
                         for row_address in column:
-                            self.model.cells[row_address].defined_names.append(
-                                name)
+                            try:
+                                self.model.cells[row_address].defined_names.append(name)
+                            except KeyError as e:
+                                pass
+                                # This typically occurs where we have a blank cell in a named range, we ignore this
+                                # TODO: Check if we need to create a cell...
                 else:
                     # programmer error
                     message = "This isn't a dim2 array. {}".format(name)
@@ -281,7 +288,7 @@ class ModelCompiler:
                     raise Exception(message)
             else:
                 message = (
-                    f"Trying to link cells for {name}, but got unkown "
+                    f"Trying to link cells for {name}, but got unknown "
                     f"type {type(defn)}"
                 )
                 logging.error(message)
