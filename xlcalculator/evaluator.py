@@ -4,6 +4,7 @@ from functools import lru_cache
 from xlcalculator.xlfunctions import xl, func_xltypes
 
 from . import ast_nodes, xltypes
+import traceback
 
 
 class EvaluatorContext(ast_nodes.EvalContext):
@@ -87,10 +88,17 @@ class Evaluator:
             value = cell.formula.ast.eval(context)
             # print(value) # TEMP
         except Exception as err:
+            # Joel 2024-06-03
+            # raise RuntimeError(
+            #     f"Problem evaluating cell {addr} formula "
+            #     f"{cell.formula.formula}: {repr(err)}"
+            # ).with_traceback(sys.exc_info()[2])
+            print(f"Problem evaluating cell {addr} formula "
+                f"{cell.formula.formula}: {repr(err)}")
+            traceback.print_exc()
             raise RuntimeError(
-                f"Problem evaluating cell {addr} formula "
-                f"{cell.formula.formula}: {repr(err)}"
-            ).with_traceback(sys.exc_info()[2])
+                f"ERROR: Problem evaluating cell {addr} formula {cell.formula.formula}")
+            
 
         # 4. Update the cell value.
         #    Note for later: If an array is returned, we should distribute the

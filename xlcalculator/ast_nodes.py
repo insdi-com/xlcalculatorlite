@@ -239,6 +239,8 @@ class FunctionNode(ASTNode):
         func_name = func_name.replace('_XLFN.', '')
         if func_name == "SUM":
             s = 1
+        if func_name == "INDIRECT":
+            print(f"INDIRECT function called with: {self.args}")
         # 2. Look up the function to use.
         # TODO - this is another place to raise an error if function does not exist.
         func = context.namespace[func_name]
