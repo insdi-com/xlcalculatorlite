@@ -117,6 +117,7 @@ def COUNTIFS(
     )
 
 
+
 @xl.register()
 @xl.validate_args
 def MAX(*numbers: Tuple[func_xltypes.Number]):
@@ -126,10 +127,18 @@ def MAX(*numbers: Tuple[func_xltypes.Number]):
         max-function-e0012414-9ac8-4b34-9a47-73e662c08098
     """
     # If no non numeric cells, return zero (is what excel does)
-    if len(numbers) < 1:
+    # numbers = xl.flatten(numbers)
+
+    num_list = list(filter(func_xltypes.Number.is_type, numbers))
+
+    if len(num_list) < 1:
         return 0
 
-    return max(filter(func_xltypes.Number.is_type, numbers))
+    if len(num_list) == 1:
+        return num_list[0]
+
+    return max(num_list)
+    # return max(filter(func_xltypes.Number.is_type, numbers))
 
 
 @xl.register()
@@ -141,13 +150,16 @@ def MIN(*numbers: Tuple[func_xltypes.Number]):
         min-function-61635d12-920f-4ce2-a70f-96f202dcc152
     """
     # If no non numeric cells, return zero (is what excel does)
-    if len(numbers) < 1:
+
+    num_list = list(filter(func_xltypes.Number.is_type, numbers))
+
+    if len(num_list) < 1:
         return 0
 
-    if len(numbers) == 1:
-        return numbers[0]
+    if len(num_list) == 1:
+        return num_list[0]
 
-    return min(filter(func_xltypes.Number.is_type, numbers))
+    return min(num_list)
 
 
 @xl.register()
