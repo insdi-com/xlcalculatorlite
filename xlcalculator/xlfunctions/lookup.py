@@ -55,6 +55,7 @@ def VLOOKUP(
 
     if range_lookup:
         closest_match = None
+        input_val_is_num = False
         if func_xltypes.Number.is_type(lookup_value):
             input_val = float(lookup_value)
             input_val_is_num = True        
@@ -105,7 +106,8 @@ def VLOOKUP(
     else:
         compare = lookup_value.__eq__
         try:
-            result = max(row for row in table_array if compare(row[0]))[col_index_num-1]
+            result = max(row for row in table_array if row and row[0] and compare(row[0]))
+            result = result[col_index_num - 1]
             print(f"Vlookup result for {lookup_value} in column {col_index_num} is: {result}")
         except ValueError:
             print(f"Vlookup result for {lookup_value} in column {col_index_num} is: None")
@@ -129,7 +131,7 @@ def MATCH(
         lookup_array: func_xltypes.XlArray,
         match_type: func_xltypes.XlAnything = 1,
 ) -> func_xltypes.XlAnything:
-    assert len(lookup_array.values[0]) == 1
+    # assert len(lookup_array.values[0]) == 1
 
     lookup_array = lookup_array.flat
 

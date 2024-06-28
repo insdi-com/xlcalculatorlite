@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.DEBUG)
 # filename = r'./examples/joel_test1/test1.xlsx'
 # filename = r'./examples/joel_test1/oracle_building_1.xlsx'
 # filename = r'./oracle_building_1.xlsx'
-filename = r'./Thames Rating Engine.xlsx'
+filename = r'./Thames.xlsx'
 compiler = ModelCompiler()
 print(f" ###### Current working directory: {os.getcwd()}")
 new_model = compiler.read_and_parse_archive(filename, build_code=True)
@@ -23,12 +23,22 @@ new_model = compiler.read_and_parse_archive(filename, build_code=True)
 
 evaluator = Evaluator(new_model)
 
-my_cell = 'Rate Card!C12'
-print(evaluator.evaluate(my_cell))
+# my_cell = 'Rating Tool!C12'
+# print(evaluator.evaluate(my_cell))
 
-m1 = evaluator.evaluate('Rate Card!C22')
-print("Rate Card!C22", m1)
-# m2 = evaluator.evaluate('motor-insdi!E19')
+# m1 = evaluator.evaluate('Rating Tool!C22')
+# print("Rating Tool!C22", m1)
+
+# evaluator.set_cell_value('Rating Tool!B7',550000)
+
+# m3 = evaluator.evaluate('CoverageLimit')
+# print("CoverageLimit ", m3)
+
+# m2 = evaluator.evaluate('Rating Tool!N6')
+# print("Rating Tool!N6: ", m2)
+
+m2 = evaluator.evaluate('Rating Tool!D7')
+print("=Rating Tool!CD7: ", m2)
 # print("motor-insdi!E19", m2)
 
 # val2 = evaluator.evaluate('Sheet1!B9')

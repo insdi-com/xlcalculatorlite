@@ -123,49 +123,22 @@ def CEILING(
     """Returns number rounded up, away from zero, to the nearest multiple of
         significance.
 
-    https://support.office.com/en-us/article/
-        ceiling-function-0a5cd7c8-0720-4f0a-bd2c-c943e510899f
+    https://support.office.com/en-us/article/ceiling-function-0a5cd7c8-0720-4f0a-bd2c-c943e510899f
     """
-
     if significance == 0:
         return 0
-
     if significance < 0 < number:
         raise xlerrors.NumExcelError('significance below zero and number \
                                       above zero is not allowed')
+    
+    # Convert numbers to Decimal for precise arithmetic
+    num = decimal.Decimal(str(number))
+    sig = decimal.Decimal(str(significance))
 
-    number = float(number)
-    significance = float(significance)
+    # Calculate the ceiling value
+    result = (num / sig).to_integral_value(rounding=decimal.ROUND_CEILING) * sig
 
-    ceiling = significance * math.ceil(number / significance)
-
-    # If number is an exact multiple of significance, no rounding occurs
-    if (number % significance) == 0:
-        return ceiling
-
-    quantize_multiplier = str(significance % 1)
-
-    # If number is negative, and significance is negative, the value is
-    # rounded down, away from zero.
-    if number < 0 and significance < 0:
-        result = decimal.Decimal(ceiling)
-        result = result.quantize(decimal.Decimal(quantize_multiplier),
-                                 rounding=decimal.ROUND_DOWN)
-        return float(result)
-
-    # If number is negative, and significance is positive, the value is
-    # rounded up towards zero.
-    if number < 0 < significance:
-        result = decimal.Decimal(ceiling)
-        result = result.quantize(decimal.Decimal(quantize_multiplier),
-                                 rounding=decimal.ROUND_UP)
-        return float(result)
-
-    # Regardless of the sign of number, a value is rounded up when adjusted
-    # away from zero.
-    result = decimal.Decimal(ceiling)
-    result = result.quantize(decimal.Decimal(quantize_multiplier),
-                             rounding=decimal.ROUND_UP)
+    # Convert result back to float
     return float(result)
 
 
@@ -426,7 +399,10 @@ def POWER(
         power-function-d3f2908b-56f4-4c3f-895a-07fb519c362a
     """
     # return np.power(number, power)
-    return math.pow(number, power)
+    if number.value == 0:
+        return 0
+    
+    return math.pow(number.value, power.value)
 
 
 # @xl.register()
@@ -664,14 +640,25 @@ def PRODUCT(
     https://support.office.com/en-us/article/
         product-function-16753e75-9f68-4874-94ac-4d2145a2fd2e
     """
-    if len(arrays) == 0:
-        raise xlerrors.NullExcelError('Not enough arguments for function.')
-
-    flat_list = array.flatten_concatenation()
-    print(f"Flat list = {flat_list}")
-    result = math.prod(flat_list)
+    result = 1
+    for array in arrays:
+        if isinstance(array, (list, tuple)):
+            for child in array:
+                if isinstance(child, (list, tuple)):
+                    for number in child:
+                        print(number)
+                        if isinstance(number.value, (int, float)):
+                            result *= number
+                else:
+                    print(number)
+                    if isinstance(number.value, (int, float)):
+                        result *= number
+        elif isinstance(array.value, (int, float)):
+            print(array)
+            result *= array
+            
+    # result = math.prod(flat_list)
     print(F"PRODUCT() result: {result}")
-
     return result
 
 

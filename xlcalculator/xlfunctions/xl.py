@@ -82,7 +82,6 @@ def _safe_validate(vtype, val, name):
 
 
 def validate_args(func):
-
     @functools.wraps(func)
     def validate(*args, **kw):
         sig = inspect.signature(func)

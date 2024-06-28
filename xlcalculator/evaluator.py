@@ -70,6 +70,7 @@ class Evaluator:
     def evaluate(self, addr, context=None):
         # 1. Resolve the address to a cell.
         addr = self.resolve_names(addr)
+
         if addr not in self.model.cells:
             # Blank cell that has no stored value in the model.
             return func_xltypes.BLANK
@@ -85,8 +86,9 @@ class Evaluator:
         #           dependencies.)
         context = context if context is not None else self._get_context(addr)
         try:
+
             value = cell.formula.ast.eval(context)
-            # print(value) # TEMP
+            # print(f"{addr} <= {value}") # TEMP
         except Exception as err:
             # Joel 2024-06-03
             # raise RuntimeError(

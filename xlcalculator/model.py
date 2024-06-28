@@ -156,6 +156,13 @@ class Model():
             and all(defined_names_comparison)
         )
 
+def clean_cell_addr(cell_addr:str):
+    if "!" in cell_addr:
+        sheet, cell = cell_addr.split("!")
+        sheet = sheet.replace("'", "")
+        return f"{sheet}!{cell}"
+    else:
+        return cell_addr
 
 class ModelCompiler:
     """Excel Workbook Data Model Compiler
@@ -202,9 +209,6 @@ class ModelCompiler:
                 cell_address = item
             else:
                 cell_address = "{}!{}".format(default_sheet, item)
-            
-            if cell_address == "Rating sheet!U101":  # TEMP
-                print("U101")
 
             if (
                     not isinstance(input_dict[item], (float, int))
@@ -231,6 +235,7 @@ class ModelCompiler:
             self.model.build_code()
 
         return self.model
+    
 
     def build_defined_names(self):
         """Add defined ranges to model."""
@@ -241,10 +246,16 @@ class ModelCompiler:
             # a cell has an address like; Sheet1!A1
             if ':' not in cell_address:
                 if cell_address not in self.model.cells:
-                    logging.warning(
-                        f"Defined name {name} refers to empty cell "
-                        f"{cell_address}. Is not being loaded.")
-                    continue
+                    cell_address = clean_cell_addr(cell_address)
+                    if cell_address not in self.model.cells:
+                        logging.warning(
+                            f"Defined name {name} refers to empty cell "
+                            f"{cell_address}. Is not being loaded.")
+                        continue
+                    else:
+                        if self.model.cells[cell_address] is not None:
+                            self.model.defined_names[name] = \
+                                self.model.cells[cell_address]
 
                 else:
                     if self.model.cells[cell_address] is not None:
@@ -296,6 +307,7 @@ class ModelCompiler:
 
     def build_ranges(self, default_sheet=None):
         for formula in self.model.formulae:
+            print(f"build_ranges formula: {formula}")
             associated_cells = set()
             for range in self.model.formulae[formula].terms:
                 if ":" in range:
