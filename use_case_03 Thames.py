@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.DEBUG)
 # filename = r'./examples/joel_test1/test1.xlsx'
 # filename = r'./examples/joel_test1/oracle_building_1.xlsx'
 # filename = r'./oracle_building_1.xlsx'
-filename = r'./Thames.xlsx'
+filename = r'./Thames2.xlsx'
 compiler = ModelCompiler()
 print(f" ###### Current working directory: {os.getcwd()}")
 new_model = compiler.read_and_parse_archive(filename, build_code=True)
@@ -37,8 +37,10 @@ evaluator = Evaluator(new_model)
 # m2 = evaluator.evaluate('Rating Tool!N6')
 # print("Rating Tool!N6: ", m2)
 
-m2 = evaluator.evaluate('Rating Tool!D7')
-print("=Rating Tool!CD7: ", m2)
+m2 = evaluator.evaluate('Rating Tool!D9')
+print("=Rating Tool!D9: ", m2)
+m2 = evaluator.evaluate('Rating Tool!F5')
+print("=Rating Tool!F5: ", m2)
 # print("motor-insdi!E19", m2)
 
 # val2 = evaluator.evaluate('Sheet1!B9')

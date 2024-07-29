@@ -40,7 +40,7 @@ def VLOOKUP(
         vlookup-function-0bbc8083-26fe-4963-8ab8-93a18ad188a1
     """
     print(f"lookup_value: {lookup_value}")
-    print(f"table_array: {len(table_array)}") # TODO: Toggle detail vs length logging
+    print(f"table_array: {(table_array)}") # TODO: Toggle detail vs length logging
     print(f"col_index_num: {col_index_num}")
     print(f"range_lookup: {range_lookup}")
     # if range_lookup:
@@ -52,6 +52,9 @@ def VLOOKUP(
     if col_index_num > len(table_array.values[0]):
         raise xlerrors.ValueExcelError(
             'col_index_num is greater than the number of cols in table_array')
+    
+    if lookup_value is None:
+        raise xlerrors.ValueExcelError('Lookup value is null')        
 
     if range_lookup:
         closest_match = None
@@ -106,7 +109,7 @@ def VLOOKUP(
     else:
         compare = lookup_value.__eq__
         try:
-            result = max(row for row in table_array if row and row[0] and compare(row[0]))
+            result = max(row for row in table_array if row and compare(row[0]))
             result = result[col_index_num - 1]
             print(f"Vlookup result for {lookup_value} in column {col_index_num} is: {result}")
         except ValueError:
