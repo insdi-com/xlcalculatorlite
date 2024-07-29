@@ -40,7 +40,7 @@ def VLOOKUP(
         vlookup-function-0bbc8083-26fe-4963-8ab8-93a18ad188a1
     """
     print(f"lookup_value: {lookup_value}")
-    print(f"table_array: {(table_array)}") # TODO: Toggle detail vs length logging
+    print(f"table_array: {len(table_array)}") # TODO: Toggle detail vs length logging
     print(f"col_index_num: {col_index_num}")
     print(f"range_lookup: {range_lookup}")
     # if range_lookup:
