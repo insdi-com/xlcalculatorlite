@@ -1,3 +1,12 @@
+
+Joel's notes:
+Things to vet on a new model:
+- check function depth. Recursion depth is limited, so we should check functions against this.
+- check for valid functions against our function list (and check arguments and structure too)
+
+
+
+
 ================
 Excel Calculator
 ================

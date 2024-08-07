@@ -6,6 +6,8 @@ from xlcalculator.xlfunctions import xl, func_xltypes
 from . import ast_nodes, xltypes
 import traceback
 
+# optimise = False # 0.04087, 0.060144, 0.04104, 0.039606, 0.0392739, 0.04424
+# optimise = True # 0.034895, 0.03976, 0.02205, 0.02350, 0.0282478, 0.26637
 
 class EvaluatorContext(ast_nodes.EvalContext):
 
@@ -35,14 +37,22 @@ class EvaluatorContext(ast_nodes.EvalContext):
 class Evaluator:
     """Traverses and evaluates a given model."""
 
-    def __init__(self, model, namespace=None):
+    def __init__(self, model, namespace=None, freeze_cells_mode:bool=False):
         self.model = model
         self.namespace = namespace \
             if namespace is not None else xl.FUNCTIONS.copy()
         self.cache_count = 0
+        self.model.freeze_cell_values = freeze_cells_mode
 
     def _get_context(self, ref):
         return EvaluatorContext(self, ref)
+
+    # let's just set this through the initialisation for now (limit user error)    
+    # def set_freeze_cells_mode(self, toggle: bool):
+    #     self.model.freeze_cell_values = toggle
+
+    # def get_freeze_cells_mode(self) -> bool:
+    #     return self.model.freeze_cell_values
 
     def resolve_names(self, addr):
         # Although defined names have been resolved in Model.create_node()
@@ -77,9 +87,15 @@ class Evaluator:
         cell = self.model.cells[addr]
 
         # 2. If there is no formula, we simply return the cell value.
-        if (cell.formula is None or cell.formula.evaluate is False):
+        if cell.formula is None:
             return func_xltypes.ExcelType.cast_from_native(
                 self.model.cells[addr].value)
+        
+        # if cell.formula.evaluate is False:
+        if self.model.freeze_cell_values and addr in self.model.frozen_cells:
+            # print(f"Won't evaluate: {addr}. Cell already has frozen value: {self.model.cells[addr].value}") # TEMP
+            return func_xltypes.ExcelType.cast_from_native(self.model.cells[addr].value)            
+
 
         # 3. Prepare the execution environment and evaluate the formula.
         #    (Note: Range nodes will automatically evaluate all their
@@ -88,7 +104,13 @@ class Evaluator:
         try:
 
             value = cell.formula.ast.eval(context)
-            # print(f"{addr} <= {value}") # TEMP
+
+            if self.model.freeze_cell_values:
+                # cell.formula.evaluate = False
+                self.model.frozen_cells[addr] = 1
+                # print(f"Value is frozen for: {addr} <= {value}") # TEMP
+            # else:
+            #     print(f">>> {addr} <= {value}")
         except Exception as err:
             # Joel 2024-06-03
             # raise RuntimeError(
@@ -108,6 +130,8 @@ class Evaluator:
         # TODO - Add spilling.
         cell.value = value
         print(f"{addr} => {cell.value}") #TEMP
+
+        # TODO: Joel - the property below seems to be dynamically added and with no further use. Need to check if this is needed at all...
         cell.need_update = False
 
         return value

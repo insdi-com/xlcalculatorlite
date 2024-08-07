@@ -19,13 +19,28 @@ class Model():
         init=False, default_factory=dict, compare=True, hash=True, repr=True)
     defined_names: dict = field(
         init=False, default_factory=dict, compare=True, hash=True, repr=True)
+    
+    # we freeze cell values to prevent deep evaluation of a formula in order to speed up execution
+    # if a cell value is set then we need to unfreeze all the frozen cells to avoid dirty reads.
+    # the evaluator is where this logic is used
+
+    frozen_cells: dict = field(
+        init=False, default_factory=dict, compare=True, hash=True, repr=True)
+    
+    freeze_cell_values = False
+
+    def clear_frozen_cells(self):
+        """Clears the frozen cells dictionary."""
+        # We may be able to improve this in future by taking a more surgical approach and looking at the graph impact
+        # print(f"Clearing {len(self.frozen_cells)} cells")
+        self.frozen_cells.clear()  # Clear the existing dictionary
 
     def set_cell_value(self, address, value):
         """Sets a new value for a specified cell."""
         print(f"set_cell_value  address: {address} value: {value}")
 
         if address in self.defined_names:
-            print("Address is a defined name")
+            # print("Address is a defined name")
             if isinstance(self.defined_names[address], xltypes.XLCell):
                 address = self.defined_names[address].address
 
@@ -47,6 +62,10 @@ class Model():
                 f"Cannot set the cell value for an address of type "
                 f"{address}. XLCell or a string is needed."
             )
+        
+        # TODO: we don't know what the impact is when we set a cells value, so we clear frozen cells
+        if self.freeze_cell_values:
+            self.clear_frozen_cells()
 
     def get_cell_value(self, address):
         print(f"GET_cell_value  address: {address}")
@@ -218,7 +237,7 @@ class ModelCompiler:
                     input_dict[item],
                     sheet_name=default_sheet
                 )
-                print(f"read_and_parse_dict Formula = {formula}") # TEMP
+                # print(f"read_and_parse_dict Formula = {formula}") # TEMP
                 cell = xltypes.XLCell(
                     cell_address, None,
                     formula=formula)

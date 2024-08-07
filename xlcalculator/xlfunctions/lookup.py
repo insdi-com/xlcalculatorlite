@@ -63,7 +63,7 @@ def VLOOKUP(
             input_val = float(lookup_value)
             input_val_is_num = True        
         for index, row in enumerate(table_array):
-            print(f"{index}. row[0]: {row[0]}")
+            # print(f"{index}. row[0]: {row[0]}")
             if func_xltypes.Number.is_type(row[0]):
                 row_val = float(row[0])
 

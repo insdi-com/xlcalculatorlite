@@ -6,6 +6,12 @@ from xlcalculator import Model
 from xlcalculator import Evaluator
 import os
 import pprint 
+
+import time
+import sys
+
+sys.setrecursionlimit(15000)
+
 logging.basicConfig(level=logging.DEBUG)
 
 # json_file_name = r'./examples/joel_test1/test1.json'
@@ -16,12 +22,18 @@ logging.basicConfig(level=logging.DEBUG)
 filename = r'./Thames2.xlsx'
 compiler = ModelCompiler()
 print(f" ###### Current working directory: {os.getcwd()}")
+
+start_time = time.time()
 new_model = compiler.read_and_parse_archive(filename, build_code=True)
 # new_model.persist_to_json_file(json_file_name)
 # reconstituted_model = Model()
 # reconstituted_model.construct_from_json_file(json_file_name, build_code=True)
 
-evaluator = Evaluator(new_model)
+evaluator = Evaluator(new_model, freeze_cells_mode=True)
+end_time = time.time()
+time1 = end_time - start_time
+
+print(f"Time taken to evaluate 1: {time1:10f} seconds")
 
 # my_cell = 'Rating Tool!C12'
 # print(evaluator.evaluate(my_cell))
@@ -37,10 +49,17 @@ evaluator = Evaluator(new_model)
 # m2 = evaluator.evaluate('Rating Tool!N6')
 # print("Rating Tool!N6: ", m2)
 
-m2 = evaluator.evaluate('Rating Tool!D9')
-print("=Rating Tool!D9: ", m2)
-m2 = evaluator.evaluate('Rating Tool!F5')
-print("=Rating Tool!F5: ", m2)
+start_time = time.time()
+
+m1 = evaluator.evaluate('Rating Tool!D23')
+print("=Rating Tool!D23: ", m1)
+m2 = evaluator.evaluate('Rating Tool!C36')
+print("=Rating Tool!C36: ", m2)
+
+end_time = time.time()
+time1 = end_time - start_time
+
+print(f"Time taken to evaluate 1: {time1:10f} seconds")
 # print("motor-insdi!E19", m2)
 
 # val2 = evaluator.evaluate('Sheet1!B9')
